@@ -14,7 +14,9 @@ const ContestDetails = () => {
   const { id } = useParams();
   const { user } = useAuth();
  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-
+ const [isSubmissionModalOpen, setIsSubmissionModalOpen] = useState(false);
+  
+  
   // const [contest,setContest] = useState(null)
   const axiosSecure = useAxiosSecure();
 
@@ -28,9 +30,21 @@ const ContestDetails = () => {
     },
   });
 
+  // submission data retrive
+  const { data: submit = [] } = useQuery({
+    queryKey: ["contests", id],
+    queryFn: async () => {
+      const result = await axiosSecure.get(
+        `http://localhost:5000/submission/${id}`
+      );
+      return result.data;
+    },
+  });
+
   // console.log(contest);
   const isEnded = new Date(contest.deadline) < new Date();
   const isRegistered = user && contest.participants?.includes(user.email);
+  const hasSubmitted = user && submit.contestId === id;
 
   return (
     <div>
@@ -91,7 +105,7 @@ const ContestDetails = () => {
               </h2>
               <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-6">
                 <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">
-                  {contest.taskInstruction}
+                  {contest?.taskInstruction}
                 </p>
               </div>
             </section>
@@ -123,7 +137,14 @@ const ContestDetails = () => {
                   <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 flex items-center text-green-400 text-sm">
                     <CheckCircle className="w-4 h-4 mr-2" />
                     You are registered!
-                        </div> </> :
+                        </div>
+                      {hasSubmitted ? <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 flex items-center text-blue-400 text-sm">
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Task submitted successfully.
+                  </div> : <Button className="w-full" size="lg" variant="primary" onClick={() => setIsSubmissionModalOpen(true)}>
+                    Submit Task
+                  </Button>}
+                      </> :
                         <>
                           <div className="flex justify-between items-center mb-4">
                     <span className="text-slate-400">Entry Fee</span>
@@ -154,7 +175,7 @@ const ContestDetails = () => {
       {/* Modals */}
       <PaymentModal isOpen={isPaymentModalOpen} contest={contest} onClose={() => setIsPaymentModalOpen(false)}/>
 
-    <TaskSubmissionModal  />
+    <TaskSubmissionModal isOpen={isSubmissionModalOpen} onClose={() => setIsSubmissionModalOpen(false)} contest={contest} />
     </div>
   );
 };

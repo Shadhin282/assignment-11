@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { CheckCircle, Link as LinkIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import Button from '../../ui/Button';
@@ -10,9 +10,8 @@ const TaskSubmissionModal = ({
   isOpen,
   onClose,
   contest,
-  onSuccess
 }) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const {
     register,
     handleSubmit,
@@ -21,19 +20,17 @@ const TaskSubmissionModal = ({
     }
   } = useForm();
   const onSubmit = async (data) => {
-    setIsSubmitting(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
-    onSuccess(data.taskLink);
+   console.log(data)
   };
+
+
   return <Modal isOpen={isOpen} onClose={onClose} title="Submit Your Work">
     <div className="mb-6">
       <h3 className="text-sm font-medium text-slate-300 mb-2">
         Task Instructions:
       </h3>
       <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-700 text-sm text-slate-400">
-        {contest.taskInstruction}
+        {contest?.taskInstruction}
       </div>
     </div>
 
@@ -58,7 +55,7 @@ const TaskSubmissionModal = ({
         <Button type="button" variant="ghost" onClick={onClose}>
           Cancel
         </Button>
-        <Button type="submit" isLoading={isSubmitting}>
+        <Button type="submit" >
           Submit Task
         </Button>
       </div>
