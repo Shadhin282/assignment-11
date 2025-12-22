@@ -1,7 +1,7 @@
 import { useParams } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "../../hook/useAxiosSecure";
-import { Calendar, Clock, Trophy, Users } from "lucide-react";
+import { Calendar, CheckCircle, Clock, Trophy, Users } from "lucide-react";
 import Countdown from '../../components/ui/Countdown'
 import useAuth from "../../authentication/context/useAuth";
 import { useState } from "react";
@@ -30,7 +30,7 @@ const ContestDetails = () => {
 
   // console.log(contest);
   const isEnded = new Date(contest.deadline) < new Date();
-   
+  const isRegistered = user && contest.participants?.includes(user.email);
 
   return (
     <div>
@@ -54,7 +54,7 @@ const ContestDetails = () => {
               <div className="flex flex-wrap gap-6 text-slate-300">
                 <div className="flex items-center">
                   <Users className="w-5 h-5 mr-2 text-blue-500" />
-                  <span> Participants</span>
+                  <span>{contest.participants?.length} Participants</span>
                 </div>
                 <div className="flex items-center">
                   <Trophy className="w-5 h-5 mr-2 text-yellow-500" />
@@ -118,9 +118,14 @@ const ContestDetails = () => {
                 </p>
               </div> : <div className="space-y-4">
                   
-                  
-                  
-                  <div className="flex justify-between items-center mb-4">
+                    {
+                      isRegistered ? <>
+                  <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 flex items-center text-green-400 text-sm">
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    You are registered!
+                        </div> </> :
+                        <>
+                          <div className="flex justify-between items-center mb-4">
                     <span className="text-slate-400">Entry Fee</span>
                     <span className="text-2xl font-bold text-white">
                       ${contest.prizeMoney}
@@ -132,6 +137,10 @@ const ContestDetails = () => {
                   <p className="text-xs text-center text-slate-500 mt-2">
                     Secure payment processing
                   </p>
+                        </>
+                  }
+                  
+                  
                 
               </div>}
               </div>
@@ -145,7 +154,7 @@ const ContestDetails = () => {
       {/* Modals */}
       <PaymentModal isOpen={isPaymentModalOpen} contest={contest} onClose={() => setIsPaymentModalOpen(false)}/>
 
-    {/* <TaskSubmissionModal  /> */}
+    <TaskSubmissionModal  />
     </div>
   );
 };
