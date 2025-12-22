@@ -4,19 +4,39 @@ import { Input } from "../../ui/Input";
 import Modal from "../../ui/Modal";
 import { useForm } from "react-hook-form";
 import { CreditCard, Lock, CheckCircle } from "lucide-react";
+import useAuth from "../../../authentication/context/useAuth";
+import axios from "axios";
 // import useAxiosSecure from "../../../hook/useAxiosSecure";
 
 const PaymentModal = ({contest, isOpen, onClose}) => {
-  
+  const { user } = useAuth();
   const {
-    register,
+    
     handleSubmit,
-    formState: { errors },
+    
   } = useForm();
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
 
-    
+    const paymentInfo = {
+      id: contest._id,
+      name : contest.name,
+      type: contest.type,
+      price: contest.prizeMoney,
+      description : contest.description,
+      image : contest.bannerImage,
+      quantity: 1,
+      participator: {
+        name: user?.displayName,
+        email: user?.email,
+        image: user?.photoURL,
+      },
+    }
+    const { data } = await axios.post(
+      `${import.meta.env.VITE_API_URL}/payment`,
+      paymentInfo
+    )
+    window.location.assign(data.url)  
 
 
   }

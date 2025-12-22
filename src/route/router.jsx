@@ -16,6 +16,7 @@ import { MyContests } from "../pages/dashboard/creator/MyContests";
 import { AddContest } from "../pages/dashboard/creator/AddContest";
 import { ManageContests } from "../pages/dashboard/admin/ManageContests";
 import { ManageUsers } from "../pages/dashboard/admin/ManageUsers";
+import PaymentSuccess from "../components/features/payment/PaymentSuccess";
 
 
 
@@ -47,6 +48,10 @@ export const router = createBrowserRouter([
       {
         path: "/contest/:id",
         element: <PrivateRoute><ContestDetails></ContestDetails></PrivateRoute>,
+      },
+      {
+        path: '/payment-success',
+        element: <PaymentSuccess></PaymentSuccess>
       },
       {
         path: "/dashboard",
