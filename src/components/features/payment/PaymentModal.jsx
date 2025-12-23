@@ -33,7 +33,7 @@ const PaymentModal = ({contest, isOpen, onClose}) => {
       },
     }
     const { data } = await axios.post(
-      `${import.meta.env.VITE_API_URL}/payment`,
+      `http://localhost:5000/payment`,
       paymentInfo
     )
     window.location.assign(data.url)  

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CheckCircle, Link as LinkIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import Button from '../../ui/Button';
@@ -13,7 +13,7 @@ const TaskSubmissionModal = ({
   onClose,
   contest,
 }) => {
-
+  
   const { user } = useAuth()
   
   const {
@@ -38,15 +38,15 @@ const TaskSubmissionModal = ({
     }
 
     const { data } = await axios.post(
-      `${import.meta.env.VITE_API_URL}/submissions`,
+      `http://localhost:5000/submissions`,
       submitInfo
     )
     console.log(data)
-
+    setClose(true)
   };
 
 
-  return <Modal isOpen={isOpen} onClose={onClose} title="Submit Your Work">
+  return <Modal isOpen={isOpen} onClose={onClose}  title="Submit Your Work">
     <div className="mb-6">
       <h3 className="text-sm font-medium text-slate-300 mb-2">
         Task Instructions:
@@ -74,7 +74,7 @@ const TaskSubmissionModal = ({
       </div>
 
       <div className="flex justify-end gap-3">
-        <Button type="button" variant="ghost" onClick={onClose}>
+        <Button type="button" variant="ghost"  onClick={onClose}>
           Cancel
         </Button>
         <Button type="submit" >

@@ -6,14 +6,19 @@ import { MOCK_CONTESTS } from '../../../utils/mockData';
 import  Button  from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { Textarea } from '../../../components/ui/Textarea';
-import { User, Save } from 'lucide-react';
+import { User, Save, Loader2 } from 'lucide-react';
 import useAxiosSecure from '../../../hook/useAxiosSecure';
 import { useQuery } from '@tanstack/react-query';
+import useRole from '../../../hook/useRole';
+
 export function Profile() {
   const {
     user,
     updateUserProfile
   } = useAuth();
+
+  const [role, isRoleLoading] = useRole();
+
   const [isEditing, setIsEditing] = useState(false);
   const {
     register,
@@ -47,7 +52,8 @@ export function Profile() {
       return result.data;
     },
   });
-
+  console.log(role)
+  console.log(user)
   if (!user) return null;
   // Calculate stats
   const participated = contest.filter(c => c.participants?.includes(user.email)).length;
@@ -67,6 +73,8 @@ export function Profile() {
     setIsEditing(false);
   };
   // console.log(user)
+  if (isRoleLoading) return <Loader2></Loader2>;
+
   return <div className="space-y-8">
     <div>
       <h1 className="text-2xl font-bold text-white">My Profile</h1>
@@ -81,8 +89,8 @@ export function Profile() {
         <div className="flex items-center gap-6 mb-8">
           <img src={user.photoURL} alt={user.displayName} className="w-24 h-24 rounded-full object-cover border-4 border-slate-800 shadow-xl" />
           <div>
-            <h2 className="text-xl font-bold text-white">{user.displayName}</h2>
-            <p className="text-slate-400 capitalize">{user.role}</p>
+            <h2 className="text-xl font-bold text-white">{user.displayName|| name}</h2>
+            <p className="text-slate-400 capitalize">{role}</p>
             <p className="text-sm text-slate-500 mt-1">
               Member since {new Date(user.joinedAt).getFullYear()}
             </p>

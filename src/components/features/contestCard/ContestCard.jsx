@@ -33,7 +33,9 @@ const ContestCard = ({ contest }) => {
         <div className="flex items-center justify-between mb-6 text-sm">
           <div className="flex items-center text-slate-300">
             <Users className="w-4 h-4 mr-2 text-blue-500" />
-            <span>{contest.participants.length} Participants</span>
+            <span>
+              {contest.participants?.length}
+              Participants</span>
           </div>
           <div className="flex items-center text-slate-300">
             <Trophy className="w-4 h-4 mr-2 text-yellow-500" />

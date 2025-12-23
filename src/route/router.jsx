@@ -51,43 +51,43 @@ export const router = createBrowserRouter([
       },
       {
         path: '/payment-success',
-        element: <PaymentSuccess></PaymentSuccess>
+        element: <PrivateRoute><PaymentSuccess></PaymentSuccess></PrivateRoute>
       },
       {
         path: "/dashboard",
-        element: <DashboardLayout></DashboardLayout>,
+        element: <PrivateRoute><DashboardLayout></DashboardLayout></PrivateRoute>,
         children: [
           {
             path: 'user/participated',
-            element: <ParticipatedContests></ParticipatedContests>
+            element: <PrivateRoute><ParticipatedContests></ParticipatedContests></PrivateRoute> 
           },
           {
             path: 'user/profile',
-            element: <Profile></Profile>
+            element: <PrivateRoute><Profile></Profile></PrivateRoute>
           },
           {
             path: 'user/winning',
-            element: <WinningContests></WinningContests>
+            element:<PrivateRoute><WinningContests></WinningContests></PrivateRoute> 
           },
           {
             path: 'admin/contests',
-            element: <ManageContests></ManageContests>
+            element: <PrivateRoute><ManageContests></ManageContests></PrivateRoute> 
           },
           {
             path: 'admin/users',
-            element: <ManageUsers></ManageUsers>
+            element: <PrivateRoute><ManageUsers></ManageUsers></PrivateRoute> 
           },
           {
             path: 'creator/contests',
-            element: <MyContests></MyContests>
+            element: <PrivateRoute><MyContests></MyContests></PrivateRoute>
           },
           {
             path: 'creator/add',
-            element: <AddContest></AddContest>
+            element: <PrivateRoute><AddContest></AddContest></PrivateRoute>
           },
           {
             path: 'creator/submissions',
-            element: <Submissions></Submissions>
+            element: <PrivateRoute><Submissions></Submissions></PrivateRoute>
           },
           {
             path: 'creator/edit',

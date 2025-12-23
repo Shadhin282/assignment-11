@@ -42,13 +42,12 @@ export function AddContest() {
 
   const {
     isPending,
-    isError,
     data,
     reset: mutationReset,
     mutateAsync,
   } = useMutation({
     mutationFn: async (payload) =>
-      await axios.post(`${import.meta.env.VITE_API_URL}contests`, payload),
+      await axios.post(`http://localhost:5000/contests`, payload),
     onSuccess: (data) => {
       console.log(data);
       mutationReset();

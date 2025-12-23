@@ -1,17 +1,19 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { Link, useLocation, useNavigate } from 'react-router';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router';
 import { toast } from 'react-toastify';
 import useAuth from '../../authentication/context/useAuth';
 import { Trophy, ArrowLeft, Loader2 } from "lucide-react";
 import Button from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
+import { saveOrUpdateUser } from '../../utils';
 
 
 const Login = () => {
-    const { signInUser, signInGoogle, setUser, loading} = useAuth();
+    const { signInUser, signInGoogle,user, loading} = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const from = location.state || '/'
   console.log(location)
   const {
     register,
@@ -21,43 +23,49 @@ const Login = () => {
 
   // const from = location.state?.from?.pathname || '/dashboard';
 
+  if (loading) return <Loader2/>
+  if (user) return <Navigate to={from} replace={true} />
+
   const onSubmit = async (data) => {
-   
+   const { email, password} = data
 
     try {
-      await signInUser(data.email, data.password)
-        .then((res) => {
-          if (loading) {
-            return Loader2
-          }
-          setUser(res.user);
-          toast.success("Successfully Sign in");
-          navigate(`${location.state ? location.state: "/home"}`);
-        })
-        
-    } catch  {
-      toast.error("Invalid email or password");
-    } 
-  };
-  const handleGoogleLogin = async () => {
-    // Mock Google Login
-    
-    try {
-      signInGoogle()
-        .then((res) => {
-          console.log(res.user);
-          setUser(res.user);
+      //User Login
+      const { user } = await signInUser(email, password)
 
-          toast.success("Google sign In Successfully");
-          navigate(`${location.state ? location.state : "/home"}`);
-        })
-        .catch((error) => {
-          toast.error(error.message);
-        });
-    } catch {
-      toast.error("Google login failed");
-    } 
-  };
+      await saveOrUpdateUser({
+        name: user?.displayName,
+        email: user?.email,
+        image: user?.photoURL,
+      })
+
+      navigate(from, { replace: true })
+      toast.success('Login Successful')
+    } catch (err) {
+      console.log(err)
+      toast.error(err?.message)
+    }
+  }
+
+  
+  const handleGoogleSignIn = async () => {
+    try {
+      //User Registration using google
+      const { user } = await signInGoogle()
+
+      await saveOrUpdateUser({
+        name: user?.displayName,
+        email: user?.email,
+        image: user?.photoURL,
+      })
+
+      navigate(from, { replace: true })
+      toast.success('Signup Successful')
+    } catch (err) {
+      console.log(err)
+      toast.error(err?.message)
+    }
+  }
     return (
        <div className="min-h-screen bg-slate-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Background decoration */}
@@ -163,7 +171,7 @@ const Login = () => {
               <Button
                 variant="secondary"
                 className="w-full"
-                onClick={handleGoogleLogin}
+                onClick={handleGoogleSignIn}
                 type="button">
                 <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
                   <path

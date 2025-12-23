@@ -6,9 +6,11 @@ import useAuth from '../../authentication/context/useAuth';
 import Button from '../ui/Button';
 import Dropdown from '../ui/Dropdown';
 import DarkLight from '../darklight/DarkLight';
+import useRole from '../../hook/useRole';
 
 const Navbar = () => {
-    const {user, logout}    = useAuth()
+  const { user, logout } = useAuth()
+  const [role] = useRole()
     const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isActive = (path) => location.pathname === path;
@@ -24,7 +26,7 @@ const Navbar = () => {
   }];
   const getDashboardLink = () => {
     if (!user) return '/dashboard';
-    switch (user.role) {
+    switch (role) {
       case 'admin':
         return '/dashboard/admin/contests';
       case 'creator':
