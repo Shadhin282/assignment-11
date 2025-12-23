@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form';
 import Button from '../../ui/Button';
 import Modal from '../../ui/Modal';
 import { Textarea } from '../../ui/Textarea';
+import axios from 'axios';
+import useAuth from '../../../authentication/context/useAuth';
 
 
 const TaskSubmissionModal = ({
@@ -11,6 +13,8 @@ const TaskSubmissionModal = ({
   onClose,
   contest,
 }) => {
+
+  const { user } = useAuth()
   
   const {
     register,
@@ -19,8 +23,26 @@ const TaskSubmissionModal = ({
       errors
     }
   } = useForm();
-  const onSubmit = async (data) => {
-   console.log(data)
+  const onSubmit = async (task) => {
+    
+    const submitInfo = {
+      
+    contestId : contest._id ,               
+    user_email : user.email,
+      taskLink: task.taskLink,
+      prizeMoney: contest.prizeMoney,
+    image : contest.bannerImage,
+    submittedAt : new Date().getTimezoneOffset() ,
+    status : "Under Review"
+           
+    }
+
+    const { data } = await axios.post(
+      `${import.meta.env.VITE_API_URL}/submissions`,
+      submitInfo
+    )
+    console.log(data)
+
   };
 
 

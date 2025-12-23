@@ -16,7 +16,7 @@ const AllContests = () => {
     queryKey: ["contests", searchQuery],
     queryFn: async () => {
       const result = await axiosSecure.get(
-        `https://contesthub-neon.vercel.app/search?search=${searchQuery}`
+        `http://localhost:5000/search?search=${searchQuery}`
       );
       return result.data;
     },

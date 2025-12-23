@@ -14,7 +14,7 @@ const ContestCard = ({ contest }) => {
           alt={contest.name}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent opacity-60" />
+        <div className="absolute inset-0 bg-linear-to-t from-slate-900 to-transparent opacity-60" />
         <div className="absolute top-4 right-4 bg-slate-900/80 backdrop-blur-sm px-3 py-1 rounded-full border border-slate-700">
           <span className="text-xs font-medium text-blue-400 uppercase tracking-wider">
             {contest.type}

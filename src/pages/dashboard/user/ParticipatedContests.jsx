@@ -5,16 +5,37 @@ import { MOCK_CONTESTS } from '../../../utils/mockData';
 import  {Table}  from '../../../components/ui/Table';
 import  Button  from '../../../components/ui/Button';
 import { Eye, CheckCircle, Clock } from 'lucide-react';
+import useAxiosSecure from '../../../hook/useAxiosSecure';
+import { useQuery } from '@tanstack/react-query';
 export function ParticipatedContests() {
   const {
     user
   } = useAuth();
+
+  const axiosSecure = useAxiosSecure();
+
+  // contest data 
+   const { data: contest = [] } = useQuery({
+    queryKey: ["contests"],
+    queryFn: async () => {
+      const result = await axiosSecure.get(
+        'http://localhost:5000/contests'
+      );
+      return result.data;
+    },
+   });
+  
+  
   if (!user) return null;
-  const participatedContests = MOCK_CONTESTS.filter(contest => contest.participants.includes(user.id)).sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime());
+  
+
+  const participatedContests = contest.filter(contest => contest.participants?.includes(user.email)).sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime());
+  
+  
   const columns = [{
     header: 'Contest Name',
     accessor: (contest) => <div className="flex items-center gap-3">
-      <img src={contest.image} alt="" className="w-10 h-10 rounded-lg object-cover" />
+      <img src={contest.bannerImage} alt="" className="w-10 h-10 rounded-lg object-cover" />
       <span className="font-medium text-white">{contest.name}</span>
     </div>
   }, {
@@ -51,7 +72,7 @@ export function ParticipatedContests() {
       <p className="text-slate-400">Track all the contests you've joined.</p>
     </div>
 
-    <Table data={participatedContests} columns={columns} actions={contest => <Link to={`/contest/${contest.id}`}>
+    <Table data={participatedContests} columns={columns} actions={contest => <Link to={`/contest/${contest._id}`}>
       <Button size="sm" variant="outline">
         <Eye className="w-4 h-4 mr-2" />
         View

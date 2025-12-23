@@ -8,6 +8,7 @@ import { Link, useLocation, useNavigate } from 'react-router';
 import { Input } from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { Select } from '../../components/ui/Select';
+import { imageUpload, saveOrUpdateUser } from '../../utils';
 
 
 
@@ -16,7 +17,7 @@ const Register = () => {
       const { registerUser, updateUserProfile, setUser,user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation()
-
+  const from = location.state || '/'
 
   const {
     register,
@@ -24,46 +25,80 @@ const Register = () => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    // console.log(data.email,data.name,data.photo,data.role)
-    const { email, name, password, role, photo } = data;
-    const photoUpload = photo[0];
+  const onSubmit = async data => {
+    const { email, name, password, photo: image } = data
+    const imageFile = image[0]
+    
 
-    registerUser(email, password).then((result) => {
-      const userInfo = result.user;
-      console.log(userInfo)
-      const formData = new FormData();
-      formData.append("image", photoUpload);
+    try {
+     
+      const imageURL = await imageUpload(imageFile)
 
-      const image_api_url = `https://api.imgbb.com/1/upload?key=${
-        import.meta.env.VITE_image_host
-      }`;
+      //1. User Registration
+      const result = await registerUser(email, password).then(res => {
+        setUser({...res.user, displayName: name,
+          photoURL: imageURL})
+      })
 
-      axios.post(image_api_url, formData).then((res) => {
-        console.log("After Image Upload: ", res.data);
+      await saveOrUpdateUser({ name, email, image: imageURL })
 
-        const userProfile = {
-          displayName: name,
-          photoURL: res.data.data.url,
-        };
+      // 2. Generate image url from selected file
 
-        updateUserProfile(userProfile)
-          .then(() => {
-            setUser({
-              ...userInfo,
-              displayName: name,
-              photoURL: photo,
-              role: role,
-            });
-            toast.success("successfully create account");
-            navigate(`${location.state ? location.state : "/home"}`);
-          })
-          .catch((err) => {
-            toast.error(err);
-          });
-      });
-    });
-  };
+      //3. Save username & profile photo
+      await updateUserProfile(name, imageURL)
+
+      navigate(from, { replace: true })
+      toast.success('Signup Successful')
+
+      console.log(result)
+    } catch (err) {
+      console.log(err)
+      toast.error(err?.message)
+    }
+  }
+
+
+
+  // const onSubmit = (data) => {
+  //   // console.log(data.email,data.name,data.photo,data.role)
+  //   const { email, name, password, role, photo } = data;
+  //   const photoUpload = photo[0];
+
+  //   registerUser(email, password).then((result) => {
+  //     const userInfo = result.user;
+  //     console.log(userInfo)
+  //     const formData = new FormData();
+  //     formData.append("image", photoUpload);
+
+  //     const image_api_url = `https://api.imgbb.com/1/upload?key=${
+  //       import.meta.env.VITE_image_host
+  //     }`;
+
+  //     axios.post(image_api_url, formData).then((res) => {
+  //       console.log("After Image Upload: ", res.data);
+
+  //       const userProfile = {
+  //         displayName: name,
+  //         photoURL: res.data.data.url,
+  //       };
+        
+  //       updateUserProfile(userProfile)
+  //         .then(() => {
+  //           setUser({
+  //             ...userInfo,
+  //             displayName: name,
+  //             photoURL: photo,
+  //             role: role,
+  //           });
+  //           toast.success("successfully create account");
+  //           navigate(`${location.state ? location.state : "/home"}`);
+  //         })
+  //         .catch((err) => {
+  //           toast.error(err);
+  //         });
+  //     });
+  //   });
+  // };
 
   console.log(user)
     return <div className="min-h-screen bg-slate-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
@@ -139,7 +174,7 @@ const Register = () => {
               error={errors.password?.message}
             />
 
-            <Select
+            {/* <Select
               label="I want to..."
               options={[
                 {
@@ -156,7 +191,7 @@ const Register = () => {
                 }
               ]}
               {...register("role")}
-            />
+            /> */}
 
             <Input
               label="Profile Photo "

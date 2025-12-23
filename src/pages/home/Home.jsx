@@ -15,9 +15,7 @@ const Home = () => {
   const { data: contestData = [] } = useQuery({
     queryKey: ["contests"],
     queryFn: async () => {
-      const result = await axiosSecure.get(
-        "https://contesthub-neon.vercel.app/contests"
-      );
+      const result = await axiosSecure.get("http://localhost:5000/contests");
       return result.data;
     },
   });
@@ -67,7 +65,7 @@ const Home = () => {
               transition={{
                 duration: 0.8,
               }}>
-              <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 mb-6 tracking-tight">
+              <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-blue-400 via-indigo-400 to-purple-400 mb-6 tracking-tight">
                 Unleash Your <br /> Creative Potential
               </h1>
               <p className="text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed">

@@ -7,10 +7,12 @@ import  Button  from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { Textarea } from '../../../components/ui/Textarea';
 import { User, Save } from 'lucide-react';
+import useAxiosSecure from '../../../hook/useAxiosSecure';
+import { useQuery } from '@tanstack/react-query';
 export function Profile() {
   const {
     user,
-    userProfile
+    updateUserProfile
   } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const {
@@ -23,10 +25,33 @@ export function Profile() {
       bio: user?.bio || ''
     }
   });
+
+  const axiosSecure = useAxiosSecure()
+
+  // contest data 
+   const { data: contest = [] } = useQuery({
+    queryKey: ["contests"],
+    queryFn: async () => {
+      const result = await axiosSecure.get(
+        'http://localhost:5000/contests'
+      );
+      return result.data;
+    },
+  });
+
+  // submission data retrive
+  const { data: submit = [] } = useQuery({
+    queryKey: ["submitted"],
+    queryFn: async () => {
+      const result = await axiosSecure.get('http://localhost:5000/submissions');
+      return result.data;
+    },
+  });
+
   if (!user) return null;
   // Calculate stats
-  const participated = MOCK_CONTESTS.filter(c => c.participants.includes(user.id)).length;
-  const won = MOCK_CONTESTS.filter(c => c.winnerId === user.id).length;
+  const participated = contest.filter(c => c.participants?.includes(user.email)).length;
+  const won = submit.filter(c => c.user_email === user.email)?.length;
   const winRate = participated > 0 ? Math.round(won / participated * 100) : 0;
   const chartData = [{
     name: 'Won',
@@ -38,7 +63,7 @@ export function Profile() {
   ];
   const COLORS = ['#f59e0b', '#3b82f6'];
   const onSubmit = (data) => {
-    userProfile(data);
+    updateUserProfile(data);
     setIsEditing(false);
   };
   // console.log(user)

@@ -15,7 +15,43 @@ const DashboardLayout = () => {
   if (!user) return null;
   const isActive = (path) => location.pathname === path;
 
-  const userLinks = [{
+  // const userLinks = [{
+  //   name: 'Participated Contests',
+  //   path: '/dashboard/user/participated',
+  //   icon: <List className="w-5 h-5" />
+  // }, {
+  //   name: 'Winning Contests',
+  //   path: '/dashboard/user/winning',
+  //   icon: <Trophy className="w-5 h-5" />
+  // }, {
+  //   name: 'My Profile',
+  //   path: '/dashboard/user/profile',
+  //   icon: <User className="w-5 h-5" />
+  // }];
+  // const creatorLinks = [{
+  //   name: 'Add Contest',
+  //   path: '/dashboard/creator/add',
+  //   icon: <PlusCircle className="w-5 h-5" />
+  // }, {
+  //   name: 'My Contests',
+  //   path: '/dashboard/creator/contests',
+  //   icon: <List className="w-5 h-5" />
+  // }, {
+  //   name: 'Submissions',
+  //   path: '/dashboard/creator/submissions',
+  //   icon: <FileText className="w-5 h-5" />
+  // }];
+  // const adminLinks = [{
+  //   name: 'Manage Users',
+  //   path: '/dashboard/admin/users',
+  //   icon: <Users className="w-5 h-5" />
+  // }, {
+  //   name: 'Manage Contests',
+  //   path: '/dashboard/admin/contests',
+  //   icon: <List className="w-5 h-5" />
+  //   }];
+  
+  const getLinks =[{
     name: 'Participated Contests',
     path: '/dashboard/user/participated',
     icon: <List className="w-5 h-5" />
@@ -27,8 +63,7 @@ const DashboardLayout = () => {
     name: 'My Profile',
     path: '/dashboard/user/profile',
     icon: <User className="w-5 h-5" />
-  }];
-  const creatorLinks = [{
+  },{
     name: 'Add Contest',
     path: '/dashboard/creator/add',
     icon: <PlusCircle className="w-5 h-5" />
@@ -40,8 +75,8 @@ const DashboardLayout = () => {
     name: 'Submissions',
     path: '/dashboard/creator/submissions',
     icon: <FileText className="w-5 h-5" />
-  }];
-  const adminLinks = [{
+  },
+    {
     name: 'Manage Users',
     path: '/dashboard/admin/users',
     icon: <Users className="w-5 h-5" />
@@ -49,18 +84,21 @@ const DashboardLayout = () => {
     name: 'Manage Contests',
     path: '/dashboard/admin/contests',
     icon: <List className="w-5 h-5" />
-  }];
-  const getLinks = () => {
-    switch (user.role) {
-      case 'admin':
-        return adminLinks;
-      case 'creator':
-        return creatorLinks;
-      default:
-        return userLinks;
     }
-  };
-  const links = getLinks();
+
+  ]
+  // const getLinks = () => {
+    
+  //   // switch (user) {
+  //   //   case 'admin':
+  //   //     return adminLinks;
+  //   //   case 'creator':
+  //   //     return creatorLinks;
+  //   //   default:
+  //   //     return userLinks;
+  //   // }
+  // };
+  const links = getLinks;
   return <div className="min-h-screen bg-slate-950 flex">
     {/* Mobile Sidebar Overlay */}
     {isSidebarOpen && <div className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)} />}

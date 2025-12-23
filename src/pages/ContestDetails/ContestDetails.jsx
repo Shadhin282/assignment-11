@@ -22,7 +22,7 @@ const ContestDetails = () => {
     queryKey: ["contests", id],
     queryFn: async () => {
       const result = await axiosSecure.get(
-        `https://contesthub-neon.vercel.app/contests/${id}`
+        `http://localhost:5000/contests/${id}`
       );
       return result.data;
     },
@@ -30,20 +30,20 @@ const ContestDetails = () => {
 
   // submission data retrive
   const { data: submit = [] } = useQuery({
-    queryKey: ["contests", id],
+    queryKey: ["submitted"],
     queryFn: async () => {
-      const result = await axiosSecure.get(
-        `https://contesthub-neon.vercel.app/submission/${id}`
-      );
+      const result = await axiosSecure.get('http://localhost:5000/submissions');
       return result.data;
     },
   });
 
-  // console.log(contest);
+  console.log(submit);
   const isEnded = new Date(contest.deadline) < new Date();
   const isRegistered = user && contest.participants?.includes(user.email);
-  const hasSubmitted = user && submit.contestId === id;
-
+  const isSubmitted = submit.find((sub) => sub?.user_email === user.email) && submit.find((sub) => sub?.contestId === id);
+  const winner = submit.find((sub) => sub?.contestId === id && sub.user_email === user.email && sub.status === "winner") ? user : null;
+ 
+  // console.log(isSubmitted);
   return (
     <div>
       <main>
@@ -106,12 +106,34 @@ const ContestDetails = () => {
                   </p>
                 </div>
               </section>
+
+              {winner && <section className="bg-linear-to-r from-yellow-900/20 to-orange-900/20 border border-yellow-500/30 rounded-xl p-8 text-center relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <Trophy className="w-32 h-32 text-yellow-500" />
+              </div>
+              <h2 className="text-2xl font-bold text-yellow-500 mb-6">
+                Winner Declared!
+              </h2>
+              <div className="inline-block relative">
+                <img src={winner.photoURL} alt={winner.displayName} className="w-24 h-24 rounded-full border-4 border-yellow-500 shadow-xl mb-4" />
+                <div className="absolute -bottom-2 -right-2 bg-yellow-500 text-slate-900 rounded-full p-1.5">
+                  <Trophy className="w-4 h-4" />
+                </div>
+              </div>
+              <h3 className="text-xl font-bold text-white">
+                {winner.displayName}
+              </h3>
+              <p className="text-slate-400">
+                Congratulations on winning ${contest.prizeMoney}!
+              </p>
+            </section>}
+
             </div>
             {/* side bar  */}
             <div className="space-y-8">
               {/* Action Card */}
               <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-xl sticky top-24">
-                {!isEnded && (
+                {!isEnded && !winner && (
                   <div className="mb-8 text-center">
                     <p className="text-sm text-slate-400 mb-2 uppercase tracking-wider">
                       Time Remaining
@@ -139,7 +161,7 @@ const ContestDetails = () => {
                           <CheckCircle className="w-4 h-4 mr-2" />
                           You are registered!
                         </div>
-                        {hasSubmitted ? (
+                        {isSubmitted ? (
                           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 flex items-center text-blue-400 text-sm">
                             <CheckCircle className="w-4 h-4 mr-2" />
                             Task submitted successfully.
