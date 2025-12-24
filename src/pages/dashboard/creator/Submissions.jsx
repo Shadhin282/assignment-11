@@ -4,31 +4,68 @@ import { MOCK_CONTESTS, MOCK_SUBMISSIONS, MOCK_USERS } from '../../../utils/mock
 import { Table } from '../../../components/ui/Table';
 import  Button  from '../../../components/ui/Button';
 import { Trophy, ExternalLink } from 'lucide-react';
+import useAxiosSecure from '../../../hook/useAxiosSecure';
+import { useQuery } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 
 export function Submissions() {
   const {
     user
   } = useAuth();
-  if (!user) return null;
+  
+  const axiosSecure = useAxiosSecure();
+// contest data
+       const { data: contestdata = [] } = useQuery({
+      queryKey: ["contests"],
+      queryFn: async () => {
+        const result = await axiosSecure.get(
+          'http://localhost:5000/contests'
+        );
+        return result.data;
+      },
+       });
+  
+  //submit data
+  const { data: submit = [] } = useQuery({
+    queryKey: ["submitted"],
+    queryFn: async () => {
+      const result = await axiosSecure.get('http://localhost:5000/submissions');
+      return result.data;
+    },
+  });
+
+  // users data
+  const { data: users = [] } = useQuery({
+    queryKey: ["userData"],
+    queryFn: async () => {
+      const result = await axiosSecure.get('http://localhost:5000/users');
+      return result.data;
+    },
+  });
+
+
+  const myContests = contestdata.filter(c => c?.creator_mail === user.email);
+  const submissions = submit.filter(s => myContests?.participent?.includes(s.user_email))
+  console.log(submissions)
   // Get submissions for contests created by this user
-  const myContestIds = MOCK_CONTESTS.filter(c => c.creatorId === user.id).map(c => c.id);
-  const submissions = MOCK_SUBMISSIONS.filter(s => myContestIds.includes(s.contestId));
+  // const myContestIds = MOCK_CONTESTS.filter(c => c.creatorId === user.id).map(c => c.id);
+  // const submissions = MOCK_SUBMISSIONS.filter(s => myContestIds.includes(s.contestId));
   const handleDeclareWinner = (submissionId, contestId) => {
     // In a real app, API call to set winner
-    alert(`Winner declared for submission ${submissionId}!`);
+    toast(`Winner declared for submission ${submissionId}!`);
   };
   const columns = [{
     header: 'Contest',
     accessor: (sub) => {
-      const contest = MOCK_CONTESTS.find(c => c.id === sub.contestId);
+      const contest = contestdata.find(c => c._id === sub.contestId);
       return <span className="text-white font-medium">{contest?.name}</span>;
     }
   }, {
     header: 'Participant',
     accessor: (sub) => {
-      const participant = MOCK_USERS.find(u => u.id === sub.userId);
+      const participant = users.find(u => u.email === sub.user_email);
       return <div className="flex items-center gap-2">
-        <img src={participant?.photo} alt="" className="w-6 h-6 rounded-full" />
+        <img src={participant?.image} alt="" className="w-6 h-6 rounded-full" />
         <span>{participant?.name}</span>
         <span className="text-xs text-slate-500">
           ({participant?.email})
@@ -55,9 +92,9 @@ export function Submissions() {
     </div>
 
     <Table data={submissions} columns={columns} actions={sub => {
-      const contest = MOCK_CONTESTS.find(c => c.id === sub.contestId);
+      const submitInfo = submit.filter(s => myContests?.participent?.includes(s.user_email));
       // Only show declare winner if no winner yet
-      if (!contest?.winnerId) {
+      if (submitInfo !== 'winner') {
         return <Button size="sm" className="bg-yellow-600 hover:bg-yellow-700 text-white" onClick={() => handleDeclareWinner(sub.id, sub.contestId)}>
           <Trophy className="w-4 h-4 mr-2" />
           Declare Winner

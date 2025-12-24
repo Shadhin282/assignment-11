@@ -5,18 +5,46 @@ import { MOCK_CONTESTS } from '../../../utils/mockData';
 import { Table } from '../../../components/ui/Table';
 import  Button  from '../../../components/ui/Button';
 import { Edit, Trash2, Eye, Clock, CheckCircle, XCircle } from 'lucide-react';
+import useAxiosSecure from '../../../hook/useAxiosSecure';
+import { useQuery } from '@tanstack/react-query';
 
 export function MyContests() {
   const {
     user
   } = useAuth();
-  const [contests, setContests] = useState(MOCK_CONTESTS.filter(c => c.creatorId === user?.id));
-  if (!user) return null;
-  const handleDelete = (id) => {
+
+  const axiosSecure = useAxiosSecure()
+
+//   const { data: contests = [] } = useQuery({
+//     queryKey: ["myContest", user?.email],
+//     queryFn: async () => {
+//       const result = await axiosSecure.get(`http://localhost:5000/mycontests/email=${user?.email}`);
+//       return result.data;
+//     },
+//   });
+// console.log(contests)
+
+  // contest data 
+     const { data: contestdata = [] } = useQuery({
+      queryKey: ["contests"],
+      queryFn: async () => {
+        const result = await axiosSecure.get(
+          'http://localhost:5000/contests'
+        );
+        return result.data;
+      },
+     });
+  const contests = contestdata.filter(c => c?.creator_mail === user.email);
+  
+  const handleDelete = () => {
     if (confirm('Are you sure you want to delete this contest?')) {
-      setContests(contests.filter(c => c.id !== id));
+      // dfj
     }
   };
+
+
+
+
   const getStatusBadge = (status) => {
     switch (status) {
       case 'approved':
@@ -33,15 +61,17 @@ export function MyContests() {
         </span>;
     }
   };
+
+
   const columns = [{
     header: 'Contest Name',
     accessor: (contest) => <div className="flex items-center gap-3">
-      <img src={contest.image} alt="" className="w-10 h-10 rounded-lg object-cover" />
+      <img src={contest.bannerImage} alt="" className="w-10 h-10 rounded-lg object-cover" />
       <span className="font-medium text-white">{contest.name}</span>
     </div>
   }, {
     header: 'Price',
-    accessor: (contest) => `$${contest.price}`
+    accessor: (contest) => `$${contest.prizeMoney}`
   }, {
     header: 'Prize',
     accessor: (contest) => <span className="text-yellow-500 font-medium">
@@ -49,8 +79,10 @@ export function MyContests() {
     </span>
   }, {
     header: 'Status',
-    accessor: (contest) => getStatusBadge(contest.status)
-  }];
+    accessor: (contest) => getStatusBadge(contest?.status)
+    }];
+  
+  
   return <div className="space-y-6">
     <div className="flex justify-between items-center">
       <div>
@@ -63,13 +95,13 @@ export function MyContests() {
     </div>
 
     <Table data={contests} columns={columns} actions={contest => <div className="flex gap-2">
-      {contest.status === 'pending' && <>
-        <Link to={`/dashboard/creator/edit/${contest.id}`}>
+      {contest?.status === 'pending' && <>
+        <Link to={`/dashboard/creator/edit/${contest._id}`}>
           <Button size="sm" variant="secondary">
             <Edit className="w-4 h-4" />
           </Button>
         </Link>
-        <Button size="sm" variant="danger" onClick={() => handleDelete(contest.id)}>
+        <Button size="sm" variant="danger" onClick={() => handleDelete(contest._id)}>
           <Trash2 className="w-4 h-4" />
         </Button>
       </>}

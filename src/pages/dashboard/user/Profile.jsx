@@ -57,7 +57,7 @@ export function Profile() {
   if (!user) return null;
   // Calculate stats
   const participated = contest.filter(c => c.participants?.includes(user.email)).length;
-  const won = submit.filter(c => c.user_email === user.email)?.length;
+  const won = submit.filter(c => c.user_email === user.email && c.status ==='winner')?.length;
   const winRate = participated > 0 ? Math.round(won / participated * 100) : 0;
   const chartData = [{
     name: 'Won',

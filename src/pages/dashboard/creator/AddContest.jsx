@@ -13,6 +13,7 @@ import { Input}  from "../../../components/ui/Input";
 import { Textarea } from "../../../components/ui/Textarea";
 import { Select } from "../../../components/ui/Select";
 import axios from "axios";
+import { imageUpload } from "../../../utils";
 
 export function AddContest() {
   const { user } = useAuth();
@@ -80,10 +81,22 @@ export function AddContest() {
   //   }
   // });
   const onSubmit = async (data) => {
-    
-
+    const imageLink = await imageUpload(data.image[0])
+    const contestInfo = {
+      
+name : data.name,
+bannerImage : imageLink,
+participants : [],
+description : data.description,
+      prizeMoney: data.prizeMoney,
+taskInstruction: data?.taskInstruction,
+type : data.type,
+      deadline: data.deadline,
+      creator_mail: user.email,
+ status : 'review'
+    }
     // Simulate API call
-    await mutateAsync(data);
+    await mutateAsync(contestInfo);
     reset();
     setSuccess(true);
     setTimeout(() => {
@@ -203,7 +216,7 @@ export function AddContest() {
               required: "Instructions are required",
             })}
             error={errors.taskInstruction?.message}
-            className="min-h-[150px]"
+            className="min-h-37.5"
           />
 
           <div className="pt-4">
@@ -215,7 +228,7 @@ export function AddContest() {
             </Button>
           </div>
         </form>
-        ;
+        
       </div>
     </div>
   );

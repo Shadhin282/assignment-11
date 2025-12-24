@@ -26,7 +26,7 @@ const PaymentSuccess = () => {
           to='/dashboard/user/participated'
           className='bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors'
         >
-          Go to My Orders
+          Go to My participations
         </Link>
       </div>
     </div>

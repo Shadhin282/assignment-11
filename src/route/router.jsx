@@ -51,7 +51,7 @@ export const router = createBrowserRouter([
       },
       {
         path: '/payment-success',
-        element: <PrivateRoute><PaymentSuccess></PaymentSuccess></PrivateRoute>
+        element: <PaymentSuccess></PaymentSuccess>
       },
       {
         path: "/dashboard",

@@ -13,16 +13,7 @@ export function WinningContests() {
 
   const axiosSecure = useAxiosSecure();
 
-  // contest data 
-   const { data: contest = [] } = useQuery({
-    queryKey: ["contests"],
-    queryFn: async () => {
-      const result = await axiosSecure.get(
-        'http://localhost:5000/contests'
-      );
-      return result.data;
-    },
-  });
+  
 
   // submission data retrive
   const { data: submit = [] } = useQuery({
@@ -34,7 +25,7 @@ export function WinningContests() {
   });
     
   if (!user) return null;
-  const winningContests = submit.filter(contest => contest.user_email === user.email);
+  const winningContests = submit.filter(contest => contest.user_email === user.email && contest.status === 'winner');
   const totalWinnings = winningContests.reduce((sum, contest) => sum + Number(contest.prizeMoney), 0);
   return <div className="space-y-8">
       <div>
