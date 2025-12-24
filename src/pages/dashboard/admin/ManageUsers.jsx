@@ -1,43 +1,147 @@
-import React, { useState } from 'react';
-import { MOCK_USERS } from '../../../utils/mockData';
-import { Table } from '../../../components/ui/Table';
-import { Select } from '../../../components/ui/Select';
-export function ManageUsers() {
-  const [users, setUsers] = useState(MOCK_USERS);
-  const handleRoleChange = (userId, newRole) => {
-    setUsers(users.map(u => u.id === userId ? {
-      ...u,
-      role: newRole
-    } : u));
-  };
-  const columns = [{
-    header: 'User',
-    accessor: (user) => <div className="flex items-center gap-3">
-      <img src={user.photo} alt="" className="w-8 h-8 rounded-full" />
-      <div>
-        <div className="font-medium text-white">{user.name}</div>
-        <div className="text-xs text-slate-500">{user.email}</div>
-      </div>
-    </div>
-  }, {
-    header: 'Current Role',
-    accessor: (user) => <span className={`capitalize px-2 py-1 rounded text-xs font-medium ${user.role === 'admin' ? 'bg-purple-500/10 text-purple-400' : user.role === 'creator' ? 'bg-blue-500/10 text-blue-400' : 'bg-slate-700 text-slate-300'}`}>
-      {user.role}
-    </span>
-  }, {
-    header: 'Change Role',
-    accessor: (user) => <select value={user.role} onChange={e => handleRoleChange(user.id, e.target.value)} className="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500">
-      <option value="user">User</option>
-      <option value="creator">Creator</option>
-      <option value="admin">Admin</option>
-    </select>
-  }];
-  return <div className="space-y-6">
-    <div>
-      <h1 className="text-2xl font-bold text-white">Manage Users</h1>
-      <p className="text-slate-400">View and manage user roles.</p>
-    </div>
+import React from 'react';
 
-    <Table data={users} columns={columns} />
-  </div>;
+import useAxiosSecure from '../../../hook/useAxiosSecure';
+import { useQuery } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
+export function ManageUsers() {
+
+  const axiosSecure = useAxiosSecure();
+    const { data: users = [], } = useQuery({
+    queryKey: ["userData"],
+    queryFn: async () => {
+      const result = await axiosSecure.get(
+        `http://localhost:5000/users`
+      );
+      return result.data;
+    },
+    });
+  
+  const handleRoleUpdate = (email,role) => {
+    console.log(email, role)
+    const newData = {
+        email,
+        role
+      }
+    Swal.fire({
+          title: "Are you sure?",
+          text: "You won't be able to revert this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, UPDATE it!",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            fetch(
+              `http://localhost:5000/update-role`,
+              {
+                method: "PATCH",
+                headers: {
+                  'Content-Type': 'application/json',
+                  
+                },
+                body: JSON.stringify(newData),
+              }
+            )
+              .then((res) => res.json())
+              .then((data) => {
+                console.log(data);
+                Swal.fire({
+                  title: "updated!",
+                  text: "Role has been updated.",
+                  icon: "success",
+                });
+               
+              })
+              .catch((err) => {
+                toast.success(err.message);
+              });
+          }
+        });
+  }
+  // console.log(usersData)
+  // const [users, setUsers] = useState(users);
+  console.log(users)
+ 
+  return <>
+      <div className='container mx-auto bg-slate-900  text-gray-400 px-4 sm:px-8'>
+        <div className='py-8'>
+          <div className='-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto'>
+            <div className='inline-block min-w-full shadow rounded-lg overflow-hidden'>
+              <table className='min-w-full  leading-normal'>
+                <thead className=''>
+                  <tr className=''>
+                    <th
+                      scope='col'
+                      className='px-5 py-3  border-b border-gray-200 text-gray-400  text-left text-sm uppercase font-normal'
+                    >
+                      Photo
+                    </th>
+                    <th
+                      scope='col'
+                      className='px-5 py-3  border-b border-gray-200 text-gray-400  text-left text-sm uppercase font-normal'
+                    >
+                      name
+                    </th>
+                    <th
+                      scope='col'
+                      className='px-5 py-3   border-b border-gray-200 text-gray-400  text-left text-sm uppercase font-normal'
+                    >
+                      Email
+                    </th>
+                    {/* <th
+                      scope='col'
+                      className='px-5 py-3  border-b border-gray-200 text-gray-400  text-left text-sm uppercase font-normal'
+                    >
+                      Role
+                    </th> */}
+
+                    <th
+                      scope='col'
+                      className='px-5 py-3   border-b border-gray-200 text-gray-400  text-left text-sm uppercase font-normal'
+                    >
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                {
+                  users.map(user => <tr>
+                      <td className='px-5 py-5 border-b border-gray-200  text-sm'>
+        <p className=' '><img src={user?.image} className='w-10 h-10 rounded-full' alt="" /></p>
+      </td>
+                      <td className='px-5 py-5 border-b border-gray-200  text-sm'>
+        <p className=' '>{user?.name}</p>
+      </td>
+                      <td className='px-5 py-5 border-b border-gray-200  text-sm'>
+        <p className=' '>{user?.email}</p>
+      </td>
+                      {/* <td className='px-5 py-5 border-b border-gray-200 bg-white text-sm'>
+        <p className='text-gray-900 '>{user?.role}</p>
+      </td> */}
+                    <td>
+                      <select
+                        // value={updatedRole}
+                        defaultValue={user?.role}
+                    onChange={e => handleRoleUpdate(user.email,e.target.value)}
+                    className='w-full my-3 border border-gray-200 rounded-xl px-2 py-3'
+                    name='role'
+                    id=''
+                  >
+                    <option value='user'>user</option>
+                    <option value='creator'>creator</option>
+                    <option value='admin'>admin</option>
+                  </select>
+                    </td>
+
+                  </tr>)
+                }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
 }

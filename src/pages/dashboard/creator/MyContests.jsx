@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router';
 import  useAuth  from '../../../authentication/context/useAuth';
 import { MOCK_CONTESTS } from '../../../utils/mockData';
@@ -7,6 +7,9 @@ import  Button  from '../../../components/ui/Button';
 import { Edit, Trash2, Eye, Clock, CheckCircle, XCircle } from 'lucide-react';
 import useAxiosSecure from '../../../hook/useAxiosSecure';
 import { useQuery } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
+import axios from 'axios';
 
 export function MyContests() {
   const {
@@ -15,32 +18,54 @@ export function MyContests() {
 
   const axiosSecure = useAxiosSecure()
 
-//   const { data: contests = [] } = useQuery({
-//     queryKey: ["myContest", user?.email],
-//     queryFn: async () => {
-//       const result = await axiosSecure.get(`http://localhost:5000/mycontests/email=${user?.email}`);
-//       return result.data;
-//     },
-//   });
-// console.log(contests)
-
-  // contest data 
-     const { data: contestdata = [] } = useQuery({
+     const { data: contests = [] } = useQuery({
       queryKey: ["contests"],
       queryFn: async () => {
         const result = await axiosSecure.get(
-          'http://localhost:5000/contests'
+          'http://localhost:5000/create-contest'
         );
         return result.data;
       },
      });
-  const contests = contestdata.filter(c => c?.creator_mail === user.email);
   
-  const handleDelete = () => {
-    if (confirm('Are you sure you want to delete this contest?')) {
-      // dfj
-    }
+  
+  const handleDelete = async(id) => {
+    console.log(id)
+     Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(
+          `http://localhost:5000/create-contest/${id}`,
+          {
+            method: "DELETE",
+          }
+        )
+          .then((res) => res.json())
+          .then((data) => {
+            console.log(data);
+            Swal.fire({
+              title: "Deleted!",
+              text: "Your file has been deleted.",
+              icon: "success",
+            });
+           
+          })
+          .catch((err) => {
+            toast.success(err.message);
+          });
+      }
+    });
   };
+      
+
+  
 
 
 

@@ -19,9 +19,9 @@ export const Table = ({
           <td colSpan={columns.length + (actions ? 1 : 0)} className="px-6 py-8 text-center text-slate-500">
             No data available
           </td>
-        </tr> : data.map(item => <tr key={item.id} className="hover:bg-slate-800/50 transition-colors">
+        </tr> : data.map(item => <tr key={item._id} className="hover:bg-slate-800/50 transition-colors">
           {columns.map((col, index) => <td key={index} className={`px-6 py-4 ${col.className || ''}`}>
-            {typeof col.accessor === 'function' ? col.accessor(item) : item[col.accessor]}
+            {typeof col?.accessor === 'function' ? col.accessor(item) : item[col.accessor]}
           </td>)}
           {actions && <td className="px-6 py-4 text-right">
             <div className="flex justify-end gap-2">

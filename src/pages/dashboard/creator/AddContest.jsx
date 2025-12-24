@@ -42,13 +42,12 @@ export function AddContest() {
   if (!user) return null;
 
   const {
-    isPending,
     data,
     reset: mutationReset,
     mutateAsync,
   } = useMutation({
     mutationFn: async (payload) =>
-      await axios.post(`http://localhost:5000/contests`, payload),
+      await axios.post(`http://localhost:5000/create-contest`, payload),
     onSuccess: (data) => {
       console.log(data);
       mutationReset();
@@ -89,11 +88,12 @@ bannerImage : imageLink,
 participants : [],
 description : data.description,
       prizeMoney: data.prizeMoney,
-taskInstruction: data?.taskInstruction,
+      taskInstruction: data?.taskInstruction,
+price : data.price,
 type : data.type,
       deadline: data.deadline,
       creator_mail: user.email,
- status : 'review'
+ status : 'pending'
     }
     // Simulate API call
     await mutateAsync(contestInfo);
@@ -104,7 +104,7 @@ type : data.type,
     }, 2000);
     setIsLoading(false);
   };
-  if (isPending) return <Loader2></Loader2>;
+  // if (isPending) return <Loader2></Loader2>;
   if (success) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] text-center">

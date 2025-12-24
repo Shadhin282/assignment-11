@@ -14,16 +14,6 @@ export function Submissions() {
   } = useAuth();
   
   const axiosSecure = useAxiosSecure();
-// contest data
-       const { data: contestdata = [] } = useQuery({
-      queryKey: ["contests"],
-      queryFn: async () => {
-        const result = await axiosSecure.get(
-          'http://localhost:5000/contests'
-        );
-        return result.data;
-      },
-       });
   
   //submit data
   const { data: submit = [] } = useQuery({
@@ -33,20 +23,16 @@ export function Submissions() {
       return result.data;
     },
   });
+  console.log(submit)
 
   // users data
-  const { data: users = [] } = useQuery({
-    queryKey: ["userData"],
-    queryFn: async () => {
-      const result = await axiosSecure.get('http://localhost:5000/users');
-      return result.data;
-    },
-  });
 
 
-  const myContests = contestdata.filter(c => c?.creator_mail === user.email);
-  const submissions = submit.filter(s => myContests?.participent?.includes(s.user_email))
-  console.log(submissions)
+
+  // const myContests = contestdata.filter(c => c?.creator_mail === user.email);
+  // console.log(myContests)
+  // const submissions = submit.filter(s => myContests?.participants?.includes(s.user_email))
+  // console.log(submissions)
   // Get submissions for contests created by this user
   // const myContestIds = MOCK_CONTESTS.filter(c => c.creatorId === user.id).map(c => c.id);
   // const submissions = MOCK_SUBMISSIONS.filter(s => myContestIds.includes(s.contestId));
@@ -57,22 +43,12 @@ export function Submissions() {
   const columns = [{
     header: 'Contest',
     accessor: (sub) => {
-      const contest = contestdata.find(c => c._id === sub.contestId);
-      return <span className="text-white font-medium">{contest?.name}</span>;
+      
+      return <span className="text-white font-medium">{sub?.name}</span>;
     }
-  }, {
-    header: 'Participant',
-    accessor: (sub) => {
-      const participant = users.find(u => u.email === sub.user_email);
-      return <div className="flex items-center gap-2">
-        <img src={participant?.image} alt="" className="w-6 h-6 rounded-full" />
-        <span>{participant?.name}</span>
-        <span className="text-xs text-slate-500">
-          ({participant?.email})
-        </span>
-      </div>;
-    }
-  }, {
+  },
+    
+    {
     header: 'Submission',
     accessor: (sub) => <a href={sub.taskLink} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 flex items-center gap-1">
       View Work <ExternalLink className="w-3 h-3" />
@@ -91,11 +67,11 @@ export function Submissions() {
       </p>
     </div>
 
-    <Table data={submissions} columns={columns} actions={sub => {
-      const submitInfo = submit.filter(s => myContests?.participent?.includes(s.user_email));
+    <Table data={submit} columns={columns} actions={sub => {
+      // const submitInfo = submit.filter(s => myContests?.participent?.includes(s.user_email));
       // Only show declare winner if no winner yet
-      if (submitInfo !== 'winner') {
-        return <Button size="sm" className="bg-yellow-600 hover:bg-yellow-700 text-white" onClick={() => handleDeclareWinner(sub.id, sub.contestId)}>
+      if (submit.status !== 'winner') {
+        return <Button size="sm" className="bg-yellow-600 hover:bg-yellow-700 text-white" onClick={() => handleDeclareWinner(sub.user_email, sub.contestId)}>
           <Trophy className="w-4 h-4 mr-2" />
           Declare Winner
         </Button>;

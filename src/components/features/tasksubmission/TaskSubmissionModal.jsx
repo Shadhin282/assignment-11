@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { CheckCircle, Link as LinkIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import Button from '../../ui/Button';
@@ -23,17 +23,19 @@ const TaskSubmissionModal = ({
       errors
     }
   } = useForm();
+
   const onSubmit = async (task) => {
     
     const submitInfo = {
       
     contestId : contest._id ,               
-    user_email : user.email,
+      user_email: user.email,
+    creator_email : contest.creator_mail || '',
       taskLink: task.taskLink,
       prizeMoney: contest.prizeMoney,
     image : contest.bannerImage,
     submittedAt : new Date().getTimezoneOffset() ,
-    status : "Under Review"
+    status : "pending"
            
     }
 
@@ -42,7 +44,7 @@ const TaskSubmissionModal = ({
       submitInfo
     )
     console.log(data)
-    setClose(true)
+    
   };
 
 

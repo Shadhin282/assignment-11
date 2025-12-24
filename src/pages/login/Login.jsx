@@ -23,7 +23,6 @@ const Login = () => {
 
   // const from = location.state?.from?.pathname || '/dashboard';
 
-  if (loading) return <Loader2/>
   if (user) return <Navigate to={from} replace={true} />
 
   const onSubmit = async (data) => {
