@@ -16,17 +16,17 @@ export function Submissions() {
   const axiosSecure = useAxiosSecure();
   
   //submit data
-  const { data: submit = [] } = useQuery({
+  const { data: submission = [] } = useQuery({
     queryKey: ["submitted"],
     queryFn: async () => {
       const result = await axiosSecure.get('http://localhost:5000/submissions');
       return result.data;
     },
   });
-  console.log(submit)
+  console.log(submission)
 
   // users data
-
+  const submit = submission.filter(c => c?.creator_mail === user.email);
 
 
   // const myContests = contestdata.filter(c => c?.creator_mail === user.email);

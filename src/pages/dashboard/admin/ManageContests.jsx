@@ -8,8 +8,9 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
+import useAuth from '../../../authentication/context/useAuth';
 export function ManageContests() {
-
+  const {user} = useAuth()
     const axiosSecure = useAxiosSecure();
     const { data: contests = [], } = useQuery({
     queryKey: ["contestData"],
@@ -47,12 +48,27 @@ export function ManageContests() {
     //   ...c,
     //   status
     // } : c));
-     const contest = contests.map(c => c.id = id)
+    const contest = contests.map(c => c.id = id)
+    const contestInfo = {
+      
+name : contest?.name,
+bannerImage : contest?.bannerImage,
+participants : [],
+description : contest?.description,
+      prizeMoney: contest?.prizeMoney,
+      taskInstruction: contest?.taskInstruction,
+price : contest?.price,
+type : contest?.type,
+      deadline: contest?.deadline,
+      creator_mail: user?.email,
+ status : 'approved'
+    }
+     
     if (status === 'approved') {
-      await mutateAsync(contest);
+      await mutateAsync(contestInfo);
       
     }
-    if (status === 'approved' && status === 'rejected') {
+    if (status === 'approved' || status === 'rejected') {
       const newData = {
         id,
         status : status

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router';
+import { Link, Navigate, useLocation } from 'react-router';
 import { Trophy, User, LayoutDashboard, LogOut, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import useAuth from '../../authentication/context/useAuth';
@@ -14,6 +14,8 @@ const Navbar = () => {
     const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isActive = (path) => location.pathname === path;
+
+  if(!logout) return <Navigate to='/home'></Navigate>
   const navLinks = [{
     name: 'Home',
     path: '/'
@@ -23,7 +25,16 @@ const Navbar = () => {
   }, {
     name: 'Winners',
     path: '/#winners'
-  }];
+    },
+    {
+      name: 'About',
+      path: '/about'
+    },
+    {
+      name: 'Contact',
+      path: '/contact'
+    }
+  ];
   const getDashboardLink = () => {
     if (!user) return '/dashboard';
     switch (role) {
